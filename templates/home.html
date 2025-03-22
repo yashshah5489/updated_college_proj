@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Smart Financial Analyzer - Home{% endblock %}
+
+{% block content %}
+<div class="home-container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="hero-section text-center mb-5">
+                <h1 class="display-4 mb-4">Smart Financial Analyzer</h1>
+                <p class="lead mb-4">
+                    Make informed financial decisions with AI-driven insights based on the latest market data and news.
+                </p>
+                {% if current_user.is_authenticated %}
+                <div class="cta-buttons">
+                    <a href="{{ url_for('analyzer.analyzer') }}" class="btn btn-primary btn-lg me-3">
+                        <i class="fas fa-search-dollar me-2"></i>Start Analyzing
+                    </a>
+                    <a href="{{ url_for('analyzer.history') }}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-history me-2"></i>View History
+                    </a>
+                </div>
+                {% else %}
+                <div class="cta-buttons">
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg me-3">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login
+                    </a>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-user-plus me-2"></i>Register
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row features-section mb-5">
+        <div class="col-md-4">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-newspaper"></i>
+                </div>
+                <h3>Latest Financial News</h3>
+                <p>
+                    Access the most recent financial news from trusted sources to keep up with market trends and financial events that impact your decisions.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3>AI-Powered Analysis</h3>
+                <p>
+                    Leverage the power of Llama 3.3 70B model to get comprehensive analysis and insights on any financial query or investment opportunity.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <h3>Historical Data</h3>
+                <p>
+                    Track your previous analyses and financial inquiries to monitor trends and maintain a record of your financial research.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <div class="how-it-works mb-5">
+                <h2 class="text-center mb-4">How It Works</h2>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Enter Your Financial Query</h4>
+                            <p>Ask about stocks, investment strategies, market trends, or any financial question.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>AI Gathers Relevant Information</h4>
+                            <p>Our system searches for the latest financial news and data related to your query.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Get Comprehensive Analysis</h4>
+                            <p>Receive AI-powered insights, recommendations, and risk assessments based on current market conditions.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
