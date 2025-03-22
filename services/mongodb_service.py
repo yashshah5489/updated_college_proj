@@ -29,9 +29,12 @@ class MongoDBService:
                 logger.warning(f"User with username {username} or email {email} already exists")
                 return None
             
+            # Generate ObjectId for new user
+            user_id = bson.ObjectId()
+            
             # Create new user
             user = User({
-                "_id": bson.ObjectId(),
+                "_id": user_id,
                 "username": username,
                 "email": email,
                 "password_hash": None  # Will be set below
@@ -42,7 +45,7 @@ class MongoDBService:
             
             # Insert user to database
             user_data = user.to_dict()
-            user_data["_id"] = bson.ObjectId()
+            user_data["_id"] = user_id
             user_data["created_at"] = datetime.now()
             
             result = self.db.users.insert_one(user_data)

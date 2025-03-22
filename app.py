@@ -33,10 +33,16 @@ from models import User
 
 @login_manager.user_loader
 def load_user(user_id):
-    user_data = mongo.db.users.find_one({"_id": user_id})
-    if user_data:
-        return User(user_data)
-    return None
+    from bson import ObjectId
+    try:
+        # Convert string ID to ObjectId
+        user_data = mongo.db.users.find_one({"_id": ObjectId(user_id)})
+        if user_data:
+            return User(user_data)
+        return None
+    except Exception as e:
+        logger.error(f"Error loading user: {str(e)}")
+        return None
 
 # Initialize services
 from services.tavily_service import TavilyService
