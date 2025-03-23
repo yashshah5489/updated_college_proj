@@ -2,12 +2,17 @@ import requests
 import logging
 import json
 from datetime import datetime
-
+import dotenv
 logger = logging.getLogger(__name__)
+
+from dotenv import load_dotenv
+load_dotenv()
+logger.info("Loaded environment variables from .env file")
 
 class GroqService:
     def __init__(self, api_key):
-        self.api_key = api_key
+        self.api_key = api_key or os.getenv("GROQ_API_KEY")
+
         self.base_url = "https://api.groq.com/openai/v1"
         self.model = "llama-3.3-70b-versatile"
         logger.info("Groq service initialized with Llama 3.3 70B model")
@@ -51,25 +56,48 @@ Exchange: {stock_data.get('exchange', 'N/A')}
 """
         
         # Format the prompt
-        prompt = f"""You are an expert financial advisor focusing on the Indian financial markets. You specialize in analyzing financial queries based on the latest Indian news, market data, and economic trends.
+        prompt = f"""You are a seasoned Indian financial advisor with extensive expertise in analyzing financial markets, regulatory trends, and economic data specific to India. Your role is to deliver actionable, data-driven advice tailored to Indian investors, considering local market conditions, tax implications, and guidelines from Indian regulatory bodies (such as SEBI and RBI).
 
 USER QUERY: {financial_query}
 
-LATEST FINANCIAL NEWS SUMMARY: 
+LATEST FINANCIAL NEWS SUMMARY:
 {news_summary}
 
 RELEVANT FINANCIAL ARTICLES:
 {article_text}
 {stock_info}
-Based on the above information about Indian markets, please provide:
-1. A comprehensive analysis of the financial query specifically for Indian investors
-2. Key insights and implications for the Indian economic context
-3. Potential risks and opportunities in the Indian market
-4. Concrete recommendations and advice tailored for Indian investors
-5. References to specific news or data points that influenced your analysis
 
-Consider relevant Indian regulatory bodies (SEBI, RBI), tax implications in India, and local market conditions.
-Format your response in a clear, professional manner with proper HTML formatting using <h3>, <p>, <ul>, <li>, <strong> tags for headers, paragraphs, lists, and emphasis.
+Based on the above information, please provide a response that includes:
+
+<h3>1. Comprehensive Analysis</h3>
+<p>
+   Deliver a detailed examination of the user’s query, incorporating current market data, economic trends, and insights drawn from the latest news and articles. Your analysis should be specifically tailored for Indian investors and reflect the nuances of the Indian financial landscape.
+</p>
+
+<h3>2. Key Insights and Implications</h3>
+<p>
+   Identify and explain the major insights from your analysis. Discuss how the information impacts the Indian economy and financial markets, including factors such as market volatility, liquidity, and regulatory changes.
+</p>
+
+<h3>3. Risks and Opportunities</h3>
+<p>
+   Outline potential risks and opportunities in the current market context. Consider aspects like market sentiment, regulatory shifts, tax changes, and global economic influences as they relate to India.
+</p>
+
+<h3>4. Concrete Recommendations</h3>
+<p>
+   Offer actionable recommendations for Indian investors. Your advice should address both short-term strategies and long-term planning, including specific investment strategies, portfolio diversification tips, and risk management techniques.
+</p>
+
+<h3>5. Supporting References</h3>
+<p>
+   Clearly reference specific news items, data points, or financial articles from the provided summaries that have shaped your analysis.
+</p>
+
+<p>
+   <strong>Additional Considerations:</strong> 
+   In your analysis, factor in the latest developments in monetary and fiscal policy, historical market trends, and any relevant tax implications. Ensure that the response is professional, well-structured, and formatted using proper HTML tags (e.g., <code>&lt;h3&gt;</code>, <code>&lt;p&gt;</code>, <code>&lt;ul&gt;</code>, <code>&lt;li&gt;</code>, <code>&lt;strong&gt;</code>).
+</p>
 """
         return prompt
     
@@ -97,7 +125,7 @@ Format your response in a clear, professional manner with proper HTML formatting
                     {"role": "user", "content": prompt}
                 ],
                 "temperature": 0.5,
-                "max_tokens": 2000
+                "max_tokens": 1000
             }
             
             # Make the API request

@@ -11,7 +11,7 @@
             <form method="POST" action="{{ url_for('analyzer.analyzer') }}" class="mb-4">
                 <div class="mb-3">
                     <label for="query" class="form-label">Enter your financial query</label>
-                    <textarea class="form-control" id="query" name="query" rows="3" placeholder="E.g., Should I invest in Tesla stock right now?" required>{% if query %}{{ query }}{% endif %}</textarea>
+                    <textarea class="form-control" id="query" name="query" rows="3" placeholder="E.g., Should I invest in Infy stock right now?" required>{% if query %}{{ query }}{% endif %}</textarea>
                 </div>
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                     <button type="submit" class="btn btn-primary">

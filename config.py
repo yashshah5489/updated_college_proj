@@ -12,7 +12,7 @@ TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY", "your-tavily-api-key")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "your-groq-api-key")
 
 # Llama 3.3 70B model configuration
-LLAMA_MODEL = "llama-3.3-70b"
+LLAMA_MODEL = "llama-3.3-70b-versatile"
 
 # Application configuration
 MAX_QUERY_LENGTH = 500
