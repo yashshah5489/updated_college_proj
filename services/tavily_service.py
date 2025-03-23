@@ -1,7 +1,9 @@
 import requests
 import logging
 import json
+import time
 from datetime import datetime, timedelta
+from requests.exceptions import RequestException, Timeout, ConnectionError
 
 logger = logging.getLogger(__name__)
 
