@@ -94,12 +94,11 @@ def analyzer():
             stock_symbol = extract_stock_symbol(financial_query)
             stock_data = None
             
-            # Get stock data if a symbol was found
+            # Get stock data if a symbol was found and is relevant
             if stock_symbol and hasattr(current_app, 'yfinance_service'):
                 logger.info(f"Extracting stock data for symbol: {stock_symbol}")
                 stock_data = current_app.yfinance_service.get_stock_data(stock_symbol)
-                if stock_data and stock_data.get('error'):
-
+                if stock_data and stock_data.get('error') or stock_symbol is None:
                     logger.warning(f"Error getting stock data: {stock_data.get('error')}")
                 else:
                     logger.info(f"Successfully retrieved stock data for {stock_symbol}")
@@ -110,10 +109,8 @@ def analyzer():
             
             # Add stock data to context if available
             if stock_data:
-                if stock_data:
-                    context['stock_data'] = stock_data
-
-                context['has_stock_data'] = True
+                context['stock_data'] = stock_data
+                context['has_stock_data'] = True if stock_symbol is not None else False
             
             # Get analysis from Groq
             logger.info(f"Analyzing financial query: {financial_query}")
@@ -211,3 +208,65 @@ def delete_analysis(analysis_id):
         logger.error(f"Error deleting analysis: {str(e)}")
         flash('An error occurred while deleting the analysis.', 'danger')
         return redirect(url_for('analyzer.history'))
+
+# Define a dictionary of Nifty 50 stocks
+nifty_50_stocks = {
+    'RELIANCE': 'RELIANCE',
+    'INFY': 'INFY',
+    'TCS': 'TCS',
+    'WIPRO': 'WIPRO', 
+    'HDFCBANK': 'HDFCBANK',
+    'ICICIBANK': 'ICICIBANK',
+    'SBIN': 'SBIN',
+    'TATAMOTORS': 'TATAMOTORS',
+    'ONGC': 'ONGC',
+    'ITC': 'ITC',
+    'BHARTIARTL': 'BHARTIARTL',
+    'SUNPHARMA': 'SUNPHARMA',
+    'TECHM': 'TECHM',
+    'KOTAKBANK': 'KOTAKBANK',
+    'HINDUNILVR': 'HINDUNILVR',
+    'MARUTI': 'MARUTI',
+    'AXISBANK': 'AXISBANK',
+    'BAJAJFINSV': 'BAJAJFINSV',
+    'COALINDIA': 'COALINDIA',
+    'HCLTECH': 'HCLTECH',
+    'ZOMATO': 'ZOMATO',
+    'PAYTM': 'PAYTM',
+    'NYKAA': 'NYKAA',
+    'ADANIGREEN': 'ADANIGREEN',
+    'ADANIPORTS': 'ADANIPORTS',
+    'ASIANPAINT': 'ASIANPAINT',
+    'BAJFINANCE': 'BAJFINANCE',
+    'BAJAJAUTO': 'BAJAJAUTO',
+    'BHARATFORG': 'BHARATFORG',
+    'BPCL': 'BPCL',
+    'CIPLA': 'CIPLA',
+    'DIVISLAB': 'DIVISLAB',
+    'DRREDDY': 'DRREDDY',
+    'EICHERMOT': 'EICHERMOT',
+    'GRASIM': 'GRASIM',
+    'HINDALCO': 'HINDALCO',
+    'HINDPETRO': 'HINDPETRO',
+    'INDUSINDBK': 'INDUSINDBK',
+    'INFY': 'INFY',
+    'ITC': 'ITC',
+    'JSWSTEEL': 'JSWSTEEL',
+    'KOTAKBANK': 'KOTAKBANK',
+    'LT': 'LT',
+    'M&M': 'M&M',
+    'MARUTI': 'MARUTI',
+    'NESTLEIND': 'NESTLEIND',
+    'NTPC': 'NTPC',
+    'ONGC': 'ONGC',
+    'POWERGRID': 'POWERGRID',
+    'RELIANCE': 'RELIANCE',
+    'SBIN': 'SBIN',
+    'SHREECEM': 'SHREECEM',
+    'SUNPHARMA': 'SUNPHARMA',
+    'TATAMOTORS': 'TATAMOTORS',
+    'TCS': 'TCS',
+    'TECHM': 'TECHM',
+    'ULTRACEMCO': 'ULTRACEMCO',
+    'WIPRO': 'WIPRO'
+}
