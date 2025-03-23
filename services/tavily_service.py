@@ -28,9 +28,19 @@ class TavilyService:
             # Set up the search parameters
             search_params = {
                 "api_key": self.api_key,
-                "query": f"financial news about {query}",
+                "query": f"Indian financial news about {query}",
                 "search_depth": "advanced",
-                "include_domains": ["bloomberg.com", "cnbc.com", "reuters.com", "wsj.com", "ft.com", "marketwatch.com"],
+                "include_domains": [
+                    "economictimes.indiatimes.com", 
+                    "moneycontrol.com", 
+                    "livemint.com", 
+                    "financialexpress.com", 
+                    "business-standard.com", 
+                    "ndtv.com/business", 
+                    "cnbctv18.com",
+                    "reuters.com", 
+                    "bloomberg.com"
+                ],
                 "max_results": max_results,
                 "include_answer": True,
                 "include_raw_content": False
