@@ -40,20 +40,22 @@ class GroqService:
         # Get stock data if available
         stock_data = context.get("stock_data", {})
         stock_info = ""
-        if stock_data and stock_data.get("symbol") != "N/A":
-            stock_info = f"""
+        if stock_data:
+            for symbol, data in stock_data.items():
+                stock_info += f"""
 STOCK INFORMATION:
-Symbol: {stock_data.get('symbol')}
-Company: {stock_data.get('name', 'N/A')}
-Current Price: {stock_data.get('price', 'N/A')}
-Change: {stock_data.get('change', 'N/A')} ({stock_data.get('change_percent', 'N/A')})
-Sector: {stock_data.get('sector', 'N/A')}
-Industry: {stock_data.get('industry', 'N/A')}
-Market Cap: {stock_data.get('market_cap', 'N/A')}
-P/E Ratio: {stock_data.get('pe_ratio', 'N/A')}
-Dividend Yield: {stock_data.get('dividend_yield', 'N/A')}
-Exchange: {stock_data.get('exchange', 'N/A')}
+Symbol: {symbol}
+Company: {data.get('name', 'N/A')}
+Current Price: {data.get('price', 'N/A')}
+Change: {data.get('change', 'N/A')} ({data.get('change_percent', 'N/A')})
+Sector: {data.get('sector', 'N/A')}
+Industry: {data.get('industry', 'N/A')}
+Market Cap: {data.get('market_cap', 'N/A')}
+P/E Ratio: {data.get('pe_ratio', 'N/A')}
+Dividend Yield: {data.get('dividend_yield', 'N/A')}
+Exchange: {data.get('exchange', 'N/A')}
 """
+
         
         # Format the prompt
         prompt = f"""You are a seasoned Indian financial advisor with extensive expertise in analyzing financial markets, regulatory trends, and economic data specific to India. Your role is to deliver actionable, data-driven advice tailored to Indian investors, considering local market conditions, tax implications, and guidelines from Indian regulatory bodies (such as SEBI and RBI).
@@ -96,7 +98,7 @@ Based on the above information, please provide a response that includes:
 
 <p>
    <strong>Additional Considerations:</strong> 
-   In your analysis, factor in the latest developments in monetary and fiscal policy, historical market trends, and any relevant tax implications. Ensure that the response is professional, well-structured, and formatted using proper HTML tags (e.g., <code>&lt;h3&gt;</code>, <code>&lt;p&gt;</code>, <code>&lt;ul&gt;</code>, <code>&lt;li&gt;</code>, <code>&lt;strong&gt;</code>).
+   In your analysis, factor in the latest developments in monetary and fiscal policy, historical market trends, and any relevant tax implications. Ensure that the response is professional, well-structured, and formatted using proper HTML tags (e.g., <code><h3></code>, <code><p></code>, <code><ul></code>, <code><li></code>, <code><strong></code>).
 </p>
 """
         return prompt
@@ -143,7 +145,7 @@ Based on the above information, please provide a response that includes:
             # Check for successful response
             if response.status_code == 200:
                 data = response.json()
-                analysis_text = data.get("choices", [{}])[0].get("message", {}).get("content", "No analysis available")
+                analysis_text = data.get("choices", [{}])[0].get("message", {}).get("content", "No analysis available") if isinstance(data.get("choices", [{}]), list) and len(data.get("choices", [{}])) > 0 else "No analysis available"
                 
                 # Process the analysis
                 analysis_result = {
@@ -155,7 +157,7 @@ Based on the above information, please provide a response that includes:
                 
                 return analysis_result
             else:
-                logger.error(f"Error from Groq API: {response.status_code} - {response.text}")
+                logger.error(f"Error from Groq API: {response.status_code} - {response.text}. Full response: {response.json()}")
                 return {
                     "analysis": "Unable to analyze the financial query at this time. Please try again later.",
                     "query": financial_query,

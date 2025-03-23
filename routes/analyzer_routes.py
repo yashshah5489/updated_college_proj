@@ -16,7 +16,7 @@ def extract_stock_symbol(query):
         query (str): The financial query
         
     Returns:
-        str: Extracted stock symbol or None
+        list: Extracted stock symbols
     """
     # Look for common patterns like "INFY", "RELIANCE", "TCS" in the query
     # This is a simple approach and can be improved with more sophisticated methods
@@ -56,21 +56,22 @@ def extract_stock_symbol(query):
         'NYKAA': 'NYKAA'
     }
     
+    stock_symbols = []
+    
     # First check for exact stock name mentions
     query_upper = query.upper()
     for stock_name, symbol in common_stocks.items():
         if stock_name in query_upper:
-            return symbol
+            stock_symbols.append(symbol)
     
     # Try regex patterns if no exact match is found
     for pattern in patterns:
         matches = re.findall(pattern, query_upper)
         if matches:
-            # Return the first match, prioritizing longer symbols
-            matches.sort(key=len, reverse=True)
-            return matches[0]
+            # Add matches to stock symbols
+            stock_symbols.extend(matches)
     
-    return None
+    return list(set(stock_symbols))  # Return unique stock symbols
 
 @analyzer_bp.route('/')
 def home():
@@ -90,31 +91,49 @@ def analyzer():
             return render_template('analyzer.html')
             
         try:
-            # Extract stock symbol if present in the query
-            stock_symbol = extract_stock_symbol(financial_query)
-            stock_data = None
-            
-            # Get stock data if a symbol was found and is relevant
-            if stock_symbol and hasattr(current_app, 'yfinance_service'):
-                logger.info(f"Extracting stock data for symbol: {stock_symbol}")
-                stock_data = current_app.yfinance_service.get_stock_data(stock_symbol)
-                if stock_data and stock_data.get('error') or stock_symbol is None:
-                    logger.warning(f"Error getting stock data: {stock_data.get('error')}")
-                else:
-                    logger.info(f"Successfully retrieved stock data for {stock_symbol}")
-            
+            # Extract stock symbols if present in the query
+            stock_symbols = extract_stock_symbol(financial_query)
+            stock_data = []
+
+            # Get stock data if symbols were found and are relevant
+            stock_data = []
+            if stock_symbols and hasattr(current_app, 'yfinance_service'):
+
+                for stock_symbol in stock_symbols:
+                    logger.info(f"Extracting stock data for symbol: {stock_symbol}")
+                    data = current_app.yfinance_service.get_stock_data(stock_symbol)
+                    if data and data.get('error'):
+                        logger.warning(f"Error getting stock data: {data.get('error')}")
+                    else:
+                        stock_data.append(data)
+
             # Get financial context from Tavily
             logger.info(f"Getting financial context for query: {financial_query}")
             context = current_app.tavily_service.get_financial_context(financial_query)
             
-            # Add stock data to context if available
-            if stock_data:
-                context['stock_data'] = stock_data
-                context['has_stock_data'] = True if stock_symbol is not None else False
+            # Ensure both Groq and Tavily are called, and stock data is displayed
+            context['stock_data'] = {}
+            if stock_symbols:
+                for symbol in stock_symbols:
+                    data = current_app.yfinance_service.get_stock_data(symbol)
+                    if data and data.get('error'):
+                        logger.warning(f"Error getting stock data for {symbol}: {data.get('error')}")
+                    else:
+                        context['stock_data'][symbol] = data  # Store data in a dictionary with symbol as key
+
+
+            # Always call Groq service with the context
+
+
+
+
+
+            context['has_stock_data'] = True if stock_data else False
             
-            # Get analysis from Groq
+            # Get analysis from Groq, ensuring the context is correct
             logger.info(f"Analyzing financial query: {financial_query}")
             analysis_result = current_app.groq_service.analyze_financial_query(financial_query, context)
+
             
             # Save the analysis to the database
             analysis_id = current_app.mongodb_service.save_financial_analysis(
