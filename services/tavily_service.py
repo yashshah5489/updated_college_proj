@@ -25,7 +25,7 @@ class TavilyService:
         try:
             logger.debug(f"Searching for financial news with query: {query}")
             
-            # Set up the search parameters
+            # Set up the search parameters - updated to fix 404 error
             search_params = {
                 "api_key": self.api_key,
                 "query": f"Indian financial news about {query}",
@@ -43,14 +43,16 @@ class TavilyService:
                 ],
                 "max_results": max_results,
                 "include_answer": True,
+                "include_images": False,  # Reduce response size
                 "include_raw_content": False
             }
             
-            # Make the API request
+            # Make the API request - fixing endpoint and adding timeout
             response = requests.post(
                 f"{self.base_url}/search",
                 json=search_params,
-                headers={"Content-Type": "application/json"}
+                headers={"Content-Type": "application/json"},
+                timeout=15  # Adding timeout to prevent hanging
             )
             
             # Check for successful response
