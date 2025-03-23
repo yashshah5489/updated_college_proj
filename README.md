@@ -1,12 +1,14 @@
 # Smart Financial Analyzer
 
-A Flask-based AI-driven financial analysis tool that provides insights using Tavily for financial news and Groq Cloud API with Llama 3.3 70B model for AI analysis.
+A Flask-based AI-driven financial analysis tool focused on the Indian market that provides insights using Tavily for financial news, Alpha Vantage for real-time stock data, and Groq Cloud API with Llama 3.3 70B model for AI analysis. Enhanced with wisdom from popular financial self-help books through RAG.
 
 ## Features
 
 - User registration and authentication
-- Financial query analysis using AI
-- News article integration for context
+- Financial query analysis using AI with India-specific insights
+- Integration with Alpha Vantage for real-time Indian stock information
+- News article integration from Indian financial sources
+- RAG-based financial wisdom from popular self-help books
 - History of financial analyses
 - Dark gradient-themed UI
 - Responsive design
@@ -78,7 +80,9 @@ pip install flask flask-login flask-pymongo pymongo bson email-validator python-
 2. Fill in your API keys:
    - Get a Tavily API key from [tavily.com](https://tavily.com)
    - Get a Groq API key from [console.groq.com](https://console.groq.com)
-   - Set a strong `SESSION_SECRET` for Flask
+   - Get an Alpha Vantage API key from [alphavantage.co](https://www.alphavantage.co/support/#api-key)
+   - Get an Anthropic API key (for Claude) from [console.anthropic.com](https://console.anthropic.com)
+   - Set a strong `SESSION_SECRET` for Flask (you can generate one with `python -c "import secrets; print(secrets.token_hex(16))"`)
    - Make sure `MONGO_URI` is set to `mongodb://localhost:27017/financial_analyzer`
 
 ### 7. Run the Application
@@ -99,8 +103,12 @@ The application will be available at `http://localhost:5000`
   - `analyzer_routes.py` - Financial analysis routes
 - `services/` - Service modules
   - `mongodb_service.py` - MongoDB operations
-  - `tavily_service.py` - Financial news API
+  - `tavily_service.py` - Financial news API (India-focused)
   - `groq_service.py` - AI analysis API
+  - `alpha_vantage_service.py` - Stock data API for Indian markets
+  - `finance_rag_service.py` - RAG service for financial wisdom
+- `data/` - Data files
+  - `finance_wisdom/` - Text snippets from popular financial self-help books
 - `static/` - Static assets
 - `templates/` - HTML templates
 
@@ -123,6 +131,7 @@ The application will be available at `http://localhost:5000`
 If you need to create a requirements.txt file, here's the content:
 
 ```
+anthropic
 bson
 email-validator
 flask

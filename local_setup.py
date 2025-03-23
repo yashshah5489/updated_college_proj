@@ -53,6 +53,9 @@ TAVILY_API_KEY=your-tavily-api-key-here
 
 # Groq API - Get your key at https://console.groq.com
 GROQ_API_KEY=your-groq-api-key-here
+
+# Alpha Vantage API - Get your key at https://www.alphavantage.co/support/#api-key
+ALPHA_VANTAGE_API_KEY=your-alpha-vantage-api-key-here
 """)
             print(".env file created. Please edit it to add your API keys")
     else:
