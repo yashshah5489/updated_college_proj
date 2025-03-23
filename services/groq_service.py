@@ -32,8 +32,26 @@ class GroqService:
         for i, article in enumerate(articles[:3], 1):  # Limiting to 3 articles to avoid token limit
             article_text += f"\nArticle {i}:\nTitle: {article.get('title')}\nContent: {article.get('content')[:500]}...\n"
         
+        # Get stock data if available
+        stock_data = context.get("stock_data", {})
+        stock_info = ""
+        if stock_data and stock_data.get("symbol") != "N/A":
+            stock_info = f"""
+STOCK INFORMATION:
+Symbol: {stock_data.get('symbol')}
+Company: {stock_data.get('name', 'N/A')}
+Current Price: {stock_data.get('price', 'N/A')}
+Change: {stock_data.get('change', 'N/A')} ({stock_data.get('change_percent', 'N/A')})
+Sector: {stock_data.get('sector', 'N/A')}
+Industry: {stock_data.get('industry', 'N/A')}
+Market Cap: {stock_data.get('market_cap', 'N/A')}
+P/E Ratio: {stock_data.get('pe_ratio', 'N/A')}
+Dividend Yield: {stock_data.get('dividend_yield', 'N/A')}
+Exchange: {stock_data.get('exchange', 'N/A')}
+"""
+        
         # Format the prompt
-        prompt = f"""You are an expert financial advisor analyzing a financial query based on the latest news and market data.
+        prompt = f"""You are an expert financial advisor focusing on the Indian financial markets. You specialize in analyzing financial queries based on the latest Indian news, market data, and economic trends.
 
 USER QUERY: {financial_query}
 
@@ -42,15 +60,16 @@ LATEST FINANCIAL NEWS SUMMARY:
 
 RELEVANT FINANCIAL ARTICLES:
 {article_text}
-
-Based on the above information, please provide:
-1. A comprehensive analysis of the financial query
-2. Key insights and implications
-3. Potential risks and opportunities
-4. Concrete recommendations and advice
+{stock_info}
+Based on the above information about Indian markets, please provide:
+1. A comprehensive analysis of the financial query specifically for Indian investors
+2. Key insights and implications for the Indian economic context
+3. Potential risks and opportunities in the Indian market
+4. Concrete recommendations and advice tailored for Indian investors
 5. References to specific news or data points that influenced your analysis
 
-Format your response in a clear, professional manner with proper sections and bullet points where appropriate.
+Consider relevant Indian regulatory bodies (SEBI, RBI), tax implications in India, and local market conditions.
+Format your response in a clear, professional manner with proper HTML formatting using <h3>, <p>, <ul>, <li>, <strong> tags for headers, paragraphs, lists, and emphasis.
 """
         return prompt
     

@@ -1,4 +1,5 @@
 import logging
+import re
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, jsonify
 from flask_login import login_required, current_user
 from datetime import datetime
@@ -6,6 +7,70 @@ from datetime import datetime
 logger = logging.getLogger(__name__)
 
 analyzer_bp = Blueprint('analyzer', __name__)
+
+def extract_stock_symbol(query):
+    """
+    Extract potential stock symbols from a query.
+    
+    Args:
+        query (str): The financial query
+        
+    Returns:
+        str: Extracted stock symbol or None
+    """
+    # Look for common patterns like "INFY", "RELIANCE", "TCS" in the query
+    # This is a simple approach and can be improved with more sophisticated methods
+    
+    # Pattern for Indian stocks (typically uppercase letters, can include .BSE or .NSE)
+    patterns = [
+        r'\b([A-Z]{2,10})\b',                # General stock symbol pattern
+        r'\b([A-Z]{2,10})\.BSE\b',           # BSE specific
+        r'\b([A-Z]{2,10})\.NSE\b',           # NSE specific
+        r'\b([A-Z]{2,10})(?:\.INDIAIDX)?\b'  # Indian indices
+    ]
+    
+    # Common Indian stock names to look for
+    common_stocks = {
+        'RELIANCE': 'RELIANCE',
+        'INFY': 'INFY',
+        'TCS': 'TCS',
+        'WIPRO': 'WIPRO', 
+        'HDFCBANK': 'HDFCBANK',
+        'ICICIBANK': 'ICICIBANK',
+        'SBIN': 'SBIN',
+        'TATAMOTORS': 'TATAMOTORS',
+        'ONGC': 'ONGC',
+        'ITC': 'ITC',
+        'BHARTIARTL': 'BHARTIARTL',
+        'SUNPHARMA': 'SUNPHARMA',
+        'TECHM': 'TECHM',
+        'KOTAKBANK': 'KOTAKBANK',
+        'HINDUNILVR': 'HINDUNILVR',
+        'MARUTI': 'MARUTI',
+        'AXISBANK': 'AXISBANK',
+        'BAJAJFINSV': 'BAJAJFINSV',
+        'COALINDIA': 'COALINDIA',
+        'HCLTECH': 'HCLTECH',
+        'ZOMATO': 'ZOMATO',
+        'PAYTM': 'PAYTM',
+        'NYKAA': 'NYKAA'
+    }
+    
+    # First check for exact stock name mentions
+    query_upper = query.upper()
+    for stock_name, symbol in common_stocks.items():
+        if stock_name in query_upper:
+            return symbol
+    
+    # Try regex patterns if no exact match is found
+    for pattern in patterns:
+        matches = re.findall(pattern, query_upper)
+        if matches:
+            # Return the first match, prioritizing longer symbols
+            matches.sort(key=len, reverse=True)
+            return matches[0]
+    
+    return None
 
 @analyzer_bp.route('/')
 def home():
@@ -25,9 +90,27 @@ def analyzer():
             return render_template('analyzer.html')
             
         try:
+            # Extract stock symbol if present in the query
+            stock_symbol = extract_stock_symbol(financial_query)
+            stock_data = None
+            
+            # Get stock data if a symbol was found
+            if stock_symbol and hasattr(current_app, 'alpha_vantage_service'):
+                logger.info(f"Extracting stock data for symbol: {stock_symbol}")
+                stock_data = current_app.alpha_vantage_service.get_stock_data(stock_symbol)
+                if stock_data.get('error'):
+                    logger.warning(f"Error getting stock data: {stock_data.get('error')}")
+                else:
+                    logger.info(f"Successfully retrieved stock data for {stock_symbol}")
+            
             # Get financial context from Tavily
             logger.info(f"Getting financial context for query: {financial_query}")
             context = current_app.tavily_service.get_financial_context(financial_query)
+            
+            # Add stock data to context if available
+            if stock_data:
+                context['stock_data'] = stock_data
+                context['has_stock_data'] = True
             
             # Get analysis from Groq
             logger.info(f"Analyzing financial query: {financial_query}")
