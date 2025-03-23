@@ -48,17 +48,17 @@ def load_user(user_id):
 from services.tavily_service import TavilyService
 from services.groq_service import GroqService
 from services.mongodb_service import MongoDBService
-from services.alpha_vantage_service import AlphaVantageService
+from services.yfinance_service import YFinanceService
 
-tavily_service = TavilyService(api_key=os.environ.get("TAVILY_API_KEY", "your-tavily-api-key"))
-groq_service = GroqService(api_key=os.environ.get("GROQ_API_KEY", "your-groq-api-key"))
+tavily_service = TavilyService(api_key=os.environ.get("TAVILY_API_KEY"))
+groq_service = GroqService(api_key=os.environ.get("GROQ_API_KEY"))
 mongodb_service = MongoDBService(mongo.db)
-alpha_vantage_service = AlphaVantageService(api_key=os.environ.get("ALPHA_VANTAGE_API_KEY", "your-alpha-vantage-api-key"))
+# alpha_vantage_service = AlphaVantageService(api_key=os.environ.get("ALPHA_VANTAGE_API_KEY"))
 
 # Make services available to the app context
 app.tavily_service = tavily_service
 app.groq_service = groq_service
 app.mongodb_service = mongodb_service
-app.alpha_vantage_service = alpha_vantage_service
+app.yfinance_service = YFinanceService()
 
 logger.info("Application initialized successfully")

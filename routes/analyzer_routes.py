@@ -95,10 +95,11 @@ def analyzer():
             stock_data = None
             
             # Get stock data if a symbol was found
-            if stock_symbol and hasattr(current_app, 'alpha_vantage_service'):
+            if stock_symbol and hasattr(current_app, 'yfinance_service'):
                 logger.info(f"Extracting stock data for symbol: {stock_symbol}")
-                stock_data = current_app.alpha_vantage_service.get_stock_data(stock_symbol)
-                if stock_data.get('error'):
+                stock_data = current_app.yfinance_service.get_stock_data(stock_symbol)
+                if stock_data and stock_data.get('error'):
+
                     logger.warning(f"Error getting stock data: {stock_data.get('error')}")
                 else:
                     logger.info(f"Successfully retrieved stock data for {stock_symbol}")
@@ -109,7 +110,9 @@ def analyzer():
             
             # Add stock data to context if available
             if stock_data:
-                context['stock_data'] = stock_data
+                if stock_data:
+                    context['stock_data'] = stock_data
+
                 context['has_stock_data'] = True
             
             # Get analysis from Groq
