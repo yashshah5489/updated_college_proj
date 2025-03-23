@@ -9,7 +9,7 @@ class GroqService:
     def __init__(self, api_key):
         self.api_key = api_key
         self.base_url = "https://api.groq.com/openai/v1"
-        self.model = "llama-3.3-70b"
+        self.model = "llama-3.3-70b-versatile"
         logger.info("Groq service initialized with Llama 3.3 70B model")
     
     def _prepare_prompt(self, financial_query, context):
